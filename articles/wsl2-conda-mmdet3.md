@@ -122,6 +122,8 @@ pip install -v -e .
 
 ## MMDetectionの動作確認：推論（WSL2のUbuntu上）
 
+RTMDet-tinyの学習済みモデルをダウンロードし、デモ画像中の物体を検出する。
+
 ```bash
 mim download mmdet --config rtmdet_tiny_8xb32-300e_coco --dest work_dirs/rtmdet/
 python demo/image_demo.py \
@@ -193,6 +195,8 @@ ln -s ${HOME}/data data
 
 ### テスト
 
+推論動作確認でダウンロードした学習済みモデルを使い、テストが実行でき、精度が再現できることを確認する。
+
 ```bash
 CONFIG_FILE=configs/rtmdet/rtmdet_tiny_8xb32-300e_coco.py
 CHECKPOINT_FILE=work_dirs/rtmdet/rtmdet_tiny_8xb32-300e_coco_20220902_112414-78e30dcc.pth
@@ -200,7 +204,7 @@ GPU_NUM=1
 bash tools/dist_test.sh ${CONFIG_FILE} ${CHECKPOINT_FILE} ${GPU_NUM}
 ```
 
-RTMDet-tinyの場合、[COCO APが41.1](https://github.com/open-mmlab/mmdetection/tree/main/configs/rtmdet)のため、`coco/bbox_mAP: 0.4110`と表示されればテスト精度再現成功。
+RTMDet-tinyの場合、[COCO APが41.1](https://github.com/open-mmlab/mmdetection/tree/main/configs/rtmdet)のため、`coco/bbox_mAP: 0.4110`と表示されればテスト時精度再現成功。
 
 ### 訓練
 
@@ -211,12 +215,13 @@ bash tools/dist_train.sh ${CONFIG_FILE} ${GPU_NUM}
 ```
 
 訓練が始まりlossが下がっていけばOK。
-RTMDetは訓練エポック数300であり、`eta: 7 days`などと表示されるため、訓練精度再現確認には向かない（そもそも8 GPU用のconfigであるため、そのままでは精度再現しない）。
+RTMDetは訓練エポック数300であり、`eta: 7 days`などと表示されるため、訓練時精度再現確認には向かない（そもそも8 GPU用のconfigであるため、そのままでは精度再現しない）。
 
-### 訓練精度再現確認
+### 補足：訓練時精度再現確認
 
-理想的には訓練精度の再現も確認する（MMDetectionでここまでやる人は稀だと思う）。
-例えば、ATSSを8 GPUで訓練する。
+理想的には、訓練時の精度再現も確認する（MMDetectionの場合、環境構築の確認目的でここまでやる人は稀だと思う）。
+具体的には、公開学習済みモデルの実験条件と同一またはできるだけ近い実験条件で訓練を行い、ほぼ同等精度になることを確認する。
+例えば、ATSS (ResNet-50) を8 GPUで訓練し、[COCO APが39.4](https://github.com/open-mmlab/mmdetection/tree/main/configs/atss)±0.1になることを確認する。
 
 ```bash
 CONFIG_FILE=configs/atss/atss_r50_fpn_1x_coco.py
